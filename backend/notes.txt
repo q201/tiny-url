@@ -1,0 +1,5 @@
+Notes:
+- Run SQL in sql/init.sql to create the 'links' table prior to starting the server.
+- Use DATABASE_URL environment variable to connect to PostgreSQL.
+
+Example: psql -d tinylink -f sql/init.sql
