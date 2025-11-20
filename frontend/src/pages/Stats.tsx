@@ -20,20 +20,20 @@ interface LinkStats {
 
 // --- Stats Component ---
 export default function Stats() {
-    const { short_code } = useParams<{ short_code: string }>(); 
+    const { code } = useParams<{ code: string }>(); 
     
     const [data, setData] = useState<LinkStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!short_code) return;
+        if (!code) return;
         
         setLoading(true);
         setError(null);
 
         // Fetching data from the absolute API endpoint
-        axios.get(`${API_BASE_URL}/links/${short_code}`)
+        axios.get(`${API_BASE_URL}/links/${code}`)
             .then(r => {
                 setData(r.data);
                 setLoading(false);
@@ -43,20 +43,20 @@ export default function Stats() {
                 const status = err.response?.status;
                 
                 if (status === 404) {
-                    setError(`Link with code '${short_code}' not found (404)`);
+                    setError(`Link with code '${code}' not found (404)`);
                 } else {
                     setError(err.response?.data?.error || 'Failed to load link statistics');
                 }
                 setLoading(false);
             });
-    }, [short_code]);
+    }, [code]);
 
     // --- Loading and Error States (Enhanced UI) ---
 
     if (loading) return (
         <div className="p-10 text-center text-gray-600">
             <BarChart2 className="w-8 h-8 animate-spin mx-auto text-blue-500"/>
-            <p className="mt-3">Loading statistics for **/{short_code}**...</p>
+            <p className="mt-3">Loading statistics for **/{code}**...</p>
         </div>
     );
     
