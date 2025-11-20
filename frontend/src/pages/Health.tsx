@@ -31,7 +31,7 @@ export default function Health() {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${API_BASE_REDIRECT}/health`);
+            const response = await fetch(`${API_BASE_REDIRECT}/healthz`);
             const data = await response.json();
             if (!response.ok) {
                 throw new Error(data.error || 'Failed to fetch health data');
