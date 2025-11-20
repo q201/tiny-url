@@ -10,7 +10,7 @@ export default function Header() {
         <Link to="/" className="text-xl font-semibold">TinyLink</Link>
         <nav>
           {pathname === '/' ? (
-            <Link to="/health" className="text-sm text-gray-600">Health</Link>
+            <Link to="/healthz" className="text-sm text-gray-600">Health</Link>
           ) : (
             <Link to="/" className="text-sm text-gray-600">Dashboard</Link>
           )}
