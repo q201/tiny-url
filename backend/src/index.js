@@ -18,7 +18,7 @@ if (!process.env.DATABASE_URL) {
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 // Health check with system details
-app.get('/health', async (req, res, next) => {
+app.get('/healthz', async (req, res, next) => {
   try {
     const totalLinks = await pool.query('SELECT COUNT(*) as count FROM links');
     const uptime = process.uptime();

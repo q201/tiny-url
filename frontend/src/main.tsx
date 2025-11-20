@@ -16,7 +16,7 @@ function App() {
         <main className="flex-1 container mx-auto p-4">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/health" element={<Health />} />
+            <Route path="/healthz" element={<Health />} />
             <Route path="/code/:code" element={<Stats />} />
           </Routes>
         </main>
