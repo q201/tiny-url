@@ -32,7 +32,7 @@ export default function Health() {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get(`${API_BASE_REDIRECT}/health`);
+            const response = await axios.get(`${API_BASE_REDIRECT}/healthz`);
             setHealth(response.data);
         } catch (err: any) {
             console.error('Health Fetch Error:', err);
