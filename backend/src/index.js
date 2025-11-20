@@ -154,7 +154,7 @@ app.delete('/api/links/:short_code', async (req, res, next) => {
 app.get('/:short_code', async (req, res, next) => {
   try {
     const { short_code } = req.params;
-    const r = await pool.query('SELECT target_url, total_clicks FROM links WHERE short_code = $1 LIMIT 1', [short_code]);
+    const r = await pool.query('SELECT target_url FROM links WHERE short_code = $1 LIMIT 1', [short_code]);
     if (r.rowCount === 0) return res.status(404).send('Not found');
     const longUrl = r.rows[0].target_url;
     await pool.query('UPDATE links SET total_clicks = total_clicks + 1, last_clicked_time = now() WHERE short_code = $1', [short_code]);

@@ -76,21 +76,38 @@ export default function Stats() {
     if (!data) return <div className="p-4 text-center text-gray-500">No data available.</div>;
 
     // --- Main Content (Redesigned) ---
-    
+
     // Helper to format the full short URL
     const fullShortUrl = `${API_BASE_REDIRECT}/${data.short_code}`;
+
+    // Handle clicking the short URL to trigger redirect and update stats
+    const handleShortLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        // Open in new tab, which triggers the redirect and database update
+        window.open(fullShortUrl, '_blank');
+        // After a brief delay, fetch updated stats to refresh the UI
+        setTimeout(() => {
+            axios.get(`${API_BASE_URL}/links/${code}`)
+                .then(r => setData(r.data))
+                .catch(err => {
+                    console.error('Error refreshing stats:', err);
+                    // Reload page as fallback if fetch fails
+                    window.location.reload();
+                });
+        }, 1500); // Slight delay to ensure DB update completes
+    };
 
     return (
         <div className="container mx-auto px-4 py-10">
             <div className="bg-white p-8 rounded-2xl shadow-2xl border-t-4 border-blue-500 max-w-2xl mx-auto">
-                
+
                 <h2 className="text-4xl font-extrabold mb-8 text-gray-800 flex items-center justify-center">
                     <BarChart2 className="w-8 h-8 mr-3 text-blue-500"/> Stats for **{data.short_code}**
                 </h2>
-                
+
                 {/* Statistics Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    
+
                     {/* Total Clicks Card */}
                     <div className="bg-blue-50 p-5 rounded-xl border border-blue-200 shadow-md">
                         <div className="flex items-center text-blue-700">
@@ -118,12 +135,13 @@ export default function Stats() {
 
                     {/* Short URL Row */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-2 bg-gray-50 p-3 rounded-lg">
-                        <strong className="text-gray-600 text-sm sm:w-1/4">Short URL:</strong> 
-                        <a 
-                            className="text-blue-600 hover:text-blue-800 break-all font-mono text-base sm:w-3/4 mt-1 sm:mt-0 transition" 
-                            href={fullShortUrl} 
-                            target="_blank" 
+                        <strong className="text-gray-600 text-sm sm:w-1/4">Short URL:</strong>
+                        <a
+                            className="text-blue-600 hover:text-blue-800 break-all font-mono text-base sm:w-3/4 mt-1 sm:mt-0 transition cursor-pointer"
+                            href={fullShortUrl}
+                            target="_blank"
                             rel="noopener noreferrer"
+                            onClick={handleShortLinkClick}
                         >
                             {fullShortUrl}
                         </a>
