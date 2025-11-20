@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Clipboard, Trash2, BarChart2, Loader, AlertTriangle, CheckCircle } from 'lucide-react';
+import axios from 'axios';
 
 // --- Configuration ---
 // Accessing environment variables
@@ -42,13 +43,12 @@ export default function Dashboard(){
         setLoading(true)
         setError(null)
         try {
-            const response = await fetch(`${API_BASE_URL}/links`);
-            const data = await handleResponse<LinkItem[]>(response);
-            setLinks(data);
-        } catch (err: any){ 
+            const response = await axios.get<LinkItem[]>(`${API_BASE_URL}/links`);
+            setLinks(response.data);
+        } catch (err: any){
             console.error('Fetch Links Error:', err);
-            setError(`Failed to load links: ${err.error || 'Network error'}`);
-            setLinks([]); 
+            setError(`Failed to load links: ${err.message || 'Network error'}`);
+            setLinks([]);
         }
         setLoading(false)
     }, []);
@@ -67,28 +67,22 @@ export default function Dashboard(){
 
         if (!validUrl(longUrl)) return setError('Please enter a valid URL (e.g., https://...)');
         if (customCode && !/^[A-Za-z0-9]{6,8}$/.test(customCode)) return setError('Custom code must be 6-8 alphanumeric characters.');
-        
+
         setLoading(true);
-        
+
         try {
-            const response = await fetch(`${API_BASE_URL}/links`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    longUrl, 
-                    customCode: customCode || undefined 
-                })
+            const response = await axios.post<LinkItem>(`${API_BASE_URL}/links`, {
+                longUrl,
+                customCode: customCode || undefined
             });
 
-            const data = await handleResponse<LinkItem>(response);
-            
-            setSuccess(`Link created! Short URL: ${API_BASE_REDIRECT}/${data.short_code}`);
+            setSuccess(`Link created! Short URL: ${API_BASE_REDIRECT}/${response.data.short_code}`);
             setLongUrl(''); setCustomCode('');
             fetchLinks();
         } catch (err: any){
             console.error('Create Link Error:', err);
-            if (err.status === 409) setError('This short code is already in use.');
-            else setError(err.error || `Creation failed (Status: ${err.status})`);
+            if (err.response?.status === 409) setError('This short code is already in use.');
+            else setError(err.response?.data?.error || `Creation failed (Status: ${err.response?.status})`);
         }
         setLoading(false);
     }
@@ -96,16 +90,11 @@ export default function Dashboard(){
     const handleDelete = async (short_code:string) => {
         if (!confirm('Are you sure you want to delete this link?')) return
         try {
-            const response = await fetch(`${API_BASE_URL}/links/${short_code}`, {
-                method: 'DELETE',
-            });
-
-            await handleResponse(response);
-            
-            setLinks(l => l.filter(x => x.short_code !== short_code)) 
-        } catch (err) { 
+            await axios.delete(`${API_BASE_URL}/links/${short_code}`);
+            setLinks(l => l.filter(x => x.short_code !== short_code))
+        } catch (err) {
             console.error('Delete Link Error:', err);
-            alert('Deletion failed. Check console for details.'); 
+            alert('Deletion failed. Check console for details.');
         }
     }
 

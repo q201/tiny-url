@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, AlertCircle, CheckCircle, Clock, Hash, Server, Zap } from 'lucide-react';
+import axios from 'axios';
 
 // --- Configuration ---
 const API_BASE_REDIRECT = (import.meta as any).env.VITE_API_REDIRECT || 'http://localhost:5000';
@@ -31,12 +32,8 @@ export default function Health() {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${API_BASE_REDIRECT}/healthz`);
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.error || 'Failed to fetch health data');
-            }
-            setHealth(data);
+            const response = await axios.get(`${API_BASE_REDIRECT}/health`);
+            setHealth(response.data);
         } catch (err: any) {
             console.error('Health Fetch Error:', err);
             setError(`Failed to load health data: ${err.message}`);
